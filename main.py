@@ -1,12 +1,12 @@
 import requests
-from datetime import datetime
 
 
 INTERVAL_DAY = "1day"
 STOCK = "TSLA"
 COMPANY_NAME = "Tesla Inc"
-FIVE_PERCENT = 0.05
+LANGUAGE = "pt"
 
+FIVE_PERCENT = 5
 
 STOCK_ENDPOINT = "https://api.twelvedata.com/time_series"
 NEWS_ENDPOINT = "https://newsapi.org/v2/everything"
@@ -23,12 +23,6 @@ stock_params = {
     "interval": INTERVAL_DAY,
     "apikey": API_KEY_STOCK,
 }
-#
-# date_now = datetime.now()
-# month = date_now.month
-# day = date_now.day
-# day_moment = f"0{month}-{day}"
-# print(day_moment)
 
 stock_response = requests.get(STOCK_ENDPOINT, params=stock_params)
 stock_response.raise_for_status()
@@ -37,18 +31,32 @@ stock_data = stock_response.json()
 yesterday_close = float(stock_data["values"][0]['close'])
 before_yesterday = float(stock_data["values"][1]['close'])
 difference = abs(yesterday_close - before_yesterday)
-
-#     #HINT 2: Work out the value of 5% of yerstday's closing stock price.
+#
+# #     #HINT 2: Work out the value of 5% of yerstday's closing stock price.
 percent = (difference / yesterday_close) * 100
-print(percent)
 if percent > FIVE_PERCENT:
     print("GET NEWS!")
 
 
-## STEP 2: Use https://newsapi.org/docs/endpoints/everything
-# Instead of printing ("Get News"), actually fetch the first 3 articles for the COMPANY_NAME. 
-#HINT 1: Think about using the Python Slice Operator
+    ## STEP 2: Use https://newsapi.org/docs/endpoints/everything
+    # Instead of printing ("Get News"), actually fetch the first 3 articles for the COMPANY_NAME.
+    #HINT 1: Think about using the Python Slice Operator
+    news_params = {
+        "apiKey": API_KEY_NEWS,
+        "language": LANGUAGE,
+        "q": COMPANY_NAME
+    }
 
+    news_response = requests.get(NEWS_ENDPOINT, params=news_params)
+    news_response.raise_for_status()
+    news_json = news_response.json()
+
+    # for article in news_json["articles"][:3]
+
+    descriptions = [article["description"] for article in news_json["articles"][:3]]
+
+    for description in descriptions:
+        print(description)
 
 
 ## STEP 3: Use twilio.com/docs/sms/quickstart/python
