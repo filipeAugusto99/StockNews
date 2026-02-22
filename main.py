@@ -43,8 +43,9 @@ if percent > FIVE_PERCENT:
     #HINT 1: Think about using the Python Slice Operator
     news_params = {
         "apiKey": API_KEY_NEWS,
+        "q": COMPANY_NAME,
         "language": LANGUAGE,
-        "q": COMPANY_NAME
+
     }
 
     news_response = requests.get(NEWS_ENDPOINT, params=news_params)
@@ -52,12 +53,8 @@ if percent > FIVE_PERCENT:
     news_json = news_response.json()
 
     # for article in news_json["articles"][:3]
-
-    descriptions = [article["description"] for article in news_json["articles"][:3]]
-
-    for description in descriptions:
-        print(description)
-
+    three_articles = news_json["articles"][:3]
+    print(three_articles)
 
 ## STEP 3: Use twilio.com/docs/sms/quickstart/python
 # Send a separate message with each article's title and description to your phone number. 
