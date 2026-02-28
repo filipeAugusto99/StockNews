@@ -7,7 +7,7 @@ STOCK = "TSLA"
 COMPANY_NAME = "Tesla Inc"
 LANGUAGE = "pt"
 
-FIVE_PERCENT = 0.01
+FIVE_PERCENT = 5
 
 STOCK_ENDPOINT = "https://api.twelvedata.com/time_series"
 NEWS_ENDPOINT = "https://newsapi.org/v2/everything"
@@ -38,10 +38,15 @@ stock_data = stock_response.json()
 yesterday_close = float(stock_data["values"][0]['close'])
 before_yesterday = float(stock_data["values"][1]['close'])
 difference = abs(yesterday_close - before_yesterday)
-#
+up_down = None
+if difference > 0:
+    up_down = "🔺"
+else:
+    up_down = "🔻"
+
 # #     #HINT 2: Work out the value of 5% of yerstday's closing stock price.
-percent = (difference / yesterday_close) * 100
-if percent > FIVE_PERCENT:
+percent = round((difference / yesterday_close) * 100)
+if abs(percent) > FIVE_PERCENT:
     # print("GET NEWS!")
 
 
@@ -67,28 +72,40 @@ if percent > FIVE_PERCENT:
 
 
     ## STEP 3: Use twilio.com/docs/sms/quickstart/python
-    # Send a separate message with each article's title and description to your phone number.
+
+
+
+
+    # for article in three_articles:
+    #     message_body = f"""
+    # Title: {article['title'][20]}
+    #
+    #
+    # Description: {article['description'][:20]}
+    # """
+    #
+    #     message = client.messages.create(
+    #         body= message_body,
+    #         from_= "+12762935848",
+    #         to= "+5581999056534"
+    #     )
+    #
+    #     message_status = client.messages(message.sid).fetch()
+    #     print(message_status.status)
+
     # HINT 1: Consider using a List Comprehension.
+    formatted_articles = [f"{STOCK}: {up_down}{percent}%\nHeadline: {article['title']}. \nBrief: {article['description']}" for article in three_articles]
 
-
+    # Send a separate message with each article's title and description to your phone number.
     client = Client(account_sid, auth_token)
-    for article in three_articles:
-        message_body = f"""
-    Title: {article['title'][20]}
 
-    
-    Description: {article['description'][:20]}
-    """
-
+    for article in formatted_articles:
         message = client.messages.create(
-            body= message_body,
+            body=article,
             from_= "+12762935848",
             to= "+5581999056534"
         )
-
-        message_status = client.messages(message.sid).fetch()
-        print(message_status.status)
-
+        print(message.status)
 
 #Optional: Format the SMS message like this: 
 """
